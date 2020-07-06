@@ -28,7 +28,7 @@ For developers, you will need the `wmi` Python package if on Windows and the `ac
 - [avell-unofficial-control-center](https://github.com/rodgomesc/avell-unofficial-control-center) - Driver to control laptop RGB keyboards that use the ITE Device(8291) controller (such as Tongfang gaming laptops).
 - [Notebook Review forum thread on Tongfang laptops](http://forum.notebookreview.com/threads/tongfang-gk5cn5z-gk5cn6z-gk5cq7z-gk5cp0z.815943/) - Contains hacks, tips, tricks, guides and reviews on and, drivers and software for Tongfang laptops.
 - [gk5cn6z_rgb_control](https://github.com/ehntoo/gk5cn6z_rgb_control/) - RGB control for GK5CN6Z laptops.
-- [https://github.com/ehntoo/gk5cn6z_wmi](gk5cn6z_wmi) - Kernel module to add backlight brightness support to Tongfang GK5CN6z (and possibly related) laptops. Contains lots of helpful links on how to debug the ACPI and WMI calls necessary to control Tongfang laptops.
+- [gk5cn6z_wmi](https://github.com/ehntoo/gk5cn6z_wmi) - Kernel module to add backlight brightness support to Tongfang GK5CN6z (and possibly related) laptops. Contains lots of helpful links on how to debug the ACPI and WMI calls necessary to control Tongfang laptops.
 - [Rev.Center2-FanManager](https://github.com/lKinderBueno/Rev.Center2-FanManager), [Rev.Center2-Keyboard](https://github.com/lKinderBueno/Rev.Center2-Keyboard), [Rev.Center2-Main-LedBar](https://github.com/lKinderBueno/Rev.Center2-Main-LedBar) - Alternative gaming control center. Very useful for figuring out what calls must be made.
 
 ## History
