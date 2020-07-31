@@ -1,4 +1,5 @@
 from acpi import BaseAcpiController
+from ecspec import *
 from fan import FanController
 from lightbar import LightBarController
 
@@ -9,29 +10,32 @@ class TongfangController():
         self.fan = FanController(self.acpi)
         self.lightbar = LightBarController(self.acpi)
 
+    def trigger(self, flag: TriggerByteFlag):
+        self.acpi.set_flag(ADDR_TRIGGER_BYTE, flag.value, True)
+
+    def check_status(self, flag: StatusByteOneFlag) -> bool:
+        flag = flag.value
+        return self.acpi.get_flag(ADDR_STATUS_BYTE, flag)
+
     def toggle_win_key_mode(self):
-        data = self.acpi.read_ecram(1895, False)
-        self.acpi.write_ecram(1895, 1 + (data & 254))
+        self.trigger(TriggerByteFlag.WinLock_Trigger)
 
     def set_win_key_enabled(self, enabled):
-        status = self.acpi.read_ecram(1896)
+        currently_enabled = self.check_status(StatusByteOneFlag.WinLock)
         if enabled:
-            if status & 1 == 1:
+            if currently_enabled:
                 self.toggle_win_key_mode()
         else:
-            if status & 1 == 0:
+            if not currently_enabled:
                 self.toggle_win_key_mode()
 
     def supports_silent_mode(self):
-        data = self.acpi.read_ecram(1115)
-        return (data & 1) == 1
+        return self.acpi.get_flag(ADDR_SILENTMODE_STATUS_BYTE, 1)
 
     def toggle_silent_mode(self):
         # Apparently not supported by my laptop
-        data = self.acpi.read_ecram(1895)
-        self.acpi.write_ecram(1895, 8 + (data & 247))
+        self.trigger(TriggerByteFlag.SilentMode_Trigger)
 
     def toggle_touchpad(self):
         # FIXME: This doesn't work
-        data = self.acpi.read_ecram(1885)
-        self.acpi.write_ecram(1885, 4 + (data & 251))
+        self.acpi.set_flag(ADDR_TRIGGER_BYTE2, 4)

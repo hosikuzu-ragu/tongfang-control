@@ -1,4 +1,7 @@
 from acpi import AcpiController
+from ecspec import *
+
+# TODO: Find out what ApExit, LB10NoKey and LB10KeyPress are and if they are supported
 
 
 class LightBarController(AcpiController):
@@ -11,35 +14,29 @@ class LightBarController(AcpiController):
     def set_color(self, r: int, g: int, b: int):
         # All brightness values must be between 0 and 255.
         if r is not None:
-            self.set_color_level(1865, r)
+            self.set_color_level(ADDR_REDBAR_CONTROL_BYTE, r)
         if g is not None:
-            self.set_color_level(1866, g)
+            self.set_color_level(ADDR_GREENBAR_CONTROL_BYTE, g)
         if b is not None:
-            self.set_color_level(1867, b)
+            self.set_color_level(ADDR_BLUEBAR_CONTROL_BYTE, b)
 
-    def set_flag(self, flag, enabled):
-        self.acpi.set_flag(1864, flag, enabled)
+    def set_flag(self, flag: RGBLightBarCtrlByteFlag, enabled: bool):
+        self.acpi.set_flag(ADDR_LIGHTBAR_CONTROL_BYTE, flag.value, enabled)
 
-    def set_power_save_mode(self, enabled):
-        self.set_flag(2, enabled)
+    def get_flag(self, flag: RGBLightBarCtrlByteFlag):
+        return self.acpi.get_flag(ADDR_LIGHTBAR_CONTROL_BYTE, flag.value)
 
-    def set_mode(self, enabled):
-        # Alternate way that doesn't work. It might apparently be isKeyPress and not isLightBarOn
-        # data = read_ecram(1864)
-        # print(data)
-        # if enabled:
-        #     write_ecram(1864, data | 32)
-        # else:
-        #     write_ecram(1864, data | 16)
+    def set_power_save_mode(self, enabled: bool):
+        self.set_flag(RGBLightBarCtrlByteFlag.PowerSaveMode, enabled)
 
-        # Alternate way to toggle [nonfunctional]
-        # data = read_ecram(1895)
-        # write_ecram(1895, 2 + (data & 253))
+    def set_on_off(self, on: bool):
+        self.set_flag(RGBLightBarCtrlByteFlag.Switch_S0, not on)
 
-        self.set_flag(4, not enabled)
+    def set_breathing_mode(self, enabled: bool):
+        self.set_flag(RGBLightBarCtrlByteFlag.Switch_S3, not enabled)
 
-    def set_breathing_mode(self, enabled):
-        self.set_flag(8, not enabled)
+    def set_colorful_mode(self, enabled: bool):
+        self.set_flag(RGBLightBarCtrlByteFlag.WelcomeLightMode, enabled)
 
-    def set_colorful_mode(self, enabled):
-        self.set_flag(128, enabled)
+    def get_colorful_mode(self):
+        return self.get_flag(RGBLightBarCtrlByteFlag.WelcomeLightMode)

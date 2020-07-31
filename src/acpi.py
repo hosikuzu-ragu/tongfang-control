@@ -158,6 +158,9 @@ class BaseAcpiController():
         else:
             self.write_ecram(address, data & (255 - flag))
 
+    def get_flag(self, address, flag) -> bool:
+        return (self.read_ecram(address) & flag) == flag
+
 
 class AcpiController():
     acpi: BaseAcpiController = None

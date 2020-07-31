@@ -1,0 +1,193 @@
+from enum import Enum
+
+BIOSFuncReg = 1142
+ecPowSource = 1168
+ADDR_BIOS_INFO_3_BYTE = 1183
+ecBt1Temperature = 1186
+ecBt1RSOC = 1195
+
+FAN_MODE_NORMAL = 0
+FAN_MODE_BOOST = 1
+FAN_MODE_CUSTOMIZE = 2
+
+FAN_CUSTOMIZEMODE_NORMAL = 0
+FAN_CUSTOMIZEMODE_BASIC = 1
+FAN_CUSTOMIZEMODE_HIGH = 2
+
+FAN_GAMING_MODE = 0
+FAN_OFFICE_MODE = 1
+FAN_TURBO_MODE = 2
+
+FAN_OFFICE_MODE_BASIC = 1
+FAN_OFFICE_MODE_ADVANCED = 2
+
+FAN_GAMING_MODE_SMART = 1
+FAN_GAMING_MODE_PERFENHANCED = 2
+
+POWER_SETTING_MODE_ECO = 1
+POWER_SETTING_MODE_STD = 2
+
+FAN_LEVEL_ZERO = 0
+FAN_LEVEL_ONE = 1
+FAN_LEVEL_TWO = 2
+FAN_LEVEL_THREE = 3
+FAN_LEVEL_FOUR = 4
+FAN_LEVEL_FIVE = 5
+
+TURBO_MODE_1 = 1
+TURBO_MODE_2 = 2
+TURBO_MODE_3 = 3
+TURBO_MODE_4 = 4
+TURBO_MODE_MIN = 1
+TURBO_MODE_MAX = 4
+TURBO_MODE_DEFAULT = 2
+
+QKEY_MODESWITCH = 0
+QKEY_FANBOOST = 1
+
+ADDR_MAFAN_CONTROL_BYTE = 1873
+ADDR_TRIGGER_BYTE2 = 1885
+ADDR_SUPPORT_BYTE1 = 1893
+ADDR_SUPPORT_BYTE2 = 1894
+ADDR_AP_OEM_BYTE = 1857
+ADDR_SUPPORT_BYTE5 = 1858
+ADDR_MYFAN2_L1_PWM = 1859
+ADDR_MYFAN2_L2_PWM = 1860
+ADDR_MYFAN2_L3_PWM = 1861
+ADDR_MYFAN2_L4_PWM = 1862
+ADDR_MYFAN2_L5_PWM = 1863
+ADDR_L1_PWM_DEFAULT_MYFAN2 = 1929
+ADDR_L2_PWM_DEFAULT_MYFAN2 = 1930
+ADDR_L3_PWM_DEFAULT_MYFAN2 = 1931
+ADDR_L4_PWM_DEFAULT_MYFAN2 = 1932
+ADDR_L5_PWM_DEFAULT_MYFAN2 = 1933
+ADDR_BIOS_OEM_BYTE2 = 1922
+ADDR_GAMING_PL1_DEFAULT_VALUE = 1840
+ADDR_GAMING_PL2_DEFAULT_VALUE = 1841
+ADDR_GAMING_PL4_DEFAULT_VALUE = 1842
+ADDR_OFFICE_PL1_DEFAULT_VALUE = 1844
+ADDR_OFFICE_PL2_DEFAULT_VALUE = 1845
+ADDR_OFFICE_PL4_DEFAULT_VALUE = 1846
+ADDR_PL1_SETTING_VALUE = 1923
+ADDR_PL2_SETTING_VALUE = 1924
+ADDR_PL4_SETTING_VALUE = 1925
+ADDR_L1_PWM_DEFAULT_MYFAN3 = 1926
+ADDR_L2_PWM_DEFAULT_MYFAN3 = 1927
+ADDR_L3_PWM_DEFAULT_MYFAN3 = 1928
+ADDR_L4_PWM_DEFAULT_MYFAN3 = 1929
+ADDR_L5_PWM_DEFAULT_MYFAN3 = 1930
+ADDR_MYFAN3_CPU_TAU = 1848
+ADDR_TRIGGER_BYTE = 1895
+ADDR_STATUS_BYTE = 1896
+ADDR_LIGHTBAR_CONTROL_BYTE = 1864
+ADDR_REDBAR_CONTROL_BYTE = 1865
+ADDR_GREENBAR_CONTROL_BYTE = 1866
+ADDR_BLUEBAR_CONTROL_BYTE = 1867
+ADDR_BATTERY_ALERT_BYTE = 1172
+ADDR_SILENTMODE_STATUS_BYTE = 1115
+ADDR_MYFAN3_GPU_SETTING = 1931
+ADDR_AP_OEM_BYTE2 = 1932
+ADDR_MYFANI_MIN_SPEED = 1950
+ADDR_MYFANI_MIN_TEMP = 1951
+ADDR_MYFANI_EXTRA_SPEED = 1952
+
+OS_VK_CAPITAL = 20
+OS_VK_NUMLOCK = 144
+OS_VK_SCROLL = 145
+
+APP_Normal_Mode = 0
+APP_ImageProjectionLight_Mode = 1
+APP_LightBar_Mode = 2
+
+
+class MyFanCTLByteFlag(Enum):
+    Normal_Mode = 0
+    Turbo_Mode = 16  # 0x00000010
+    FanBoost_Mode = 64  # 0x00000040
+    User_Fan_Mode = 128  # 0x00000080
+    User_Fan_Level1 = 129  # 0x00000081
+    User_Fan_Level2 = 130  # 0x00000082
+    User_Fan_Level3 = 131  # 0x00000083
+    User_Fan_Level4 = 132  # 0x00000084
+    User_Fan_Level5 = 133  # 0x00000085
+    User_Fan_HiMode = 160  # 0x000000A0
+
+
+class TriggerByteFlag(Enum):
+    WinLock_Trigger = 1
+    LightBar_Trigger = 2
+    FanBoost_Trigger = 4
+    SilentMode_Trigger = 8
+    USBCharger_Trigger = 16  # 0x00000010
+    RGBKeybaord_Trigger = 32  # 0x00000020
+    RGBLogo_Trigger = 64  # 0x00000040
+    RGBKeybaordWelcome_Trigger = 128  # 0x00000080
+
+
+class SupportByteOneFlag(Enum):
+    AirplaneMode = 1
+    GPSSwitch = 2
+    OverClock = 4
+    MacroKey = 8
+    ShortCutKey = 16  # 0x00000010
+    WinLockKey = 32  # 0x00000020
+    LightBar = 64  # 0x00000040
+    FanBoost = 128  # 0x00000080
+
+
+class SupportByteTwoFlag(Enum):
+    SilentMode = 1
+    USBChargerMode = 2
+    RGBKeyBoard = 4
+    MyBat = 64  # 0x00000040
+
+
+class SupportByteThreeFlag(Enum):
+    FullZone = 1
+    FourZone = 2
+    FourZoneReady = 4
+
+
+class StatusByteOneFlag(Enum):
+    WinLock = 1
+    BreathLed = 2
+    FanBoost = 4
+    MacroKey = 8
+    MyBatPowerBat = 16  # 0x00000010
+
+
+class RGBLightBarCtrlByteFlag(Enum):
+    ApExit = 1
+    PowerSaveMode = 2
+    Switch_S0 = 4
+    Switch_S3 = 8
+    LB10NoKey = 16  # 0x00000010
+    LB10KeyPress = 32  # 0x00000020
+    WelcomeLightMode = 128  # 0x00000080
+
+
+class MyFan2SpeedByteFlag(Enum):
+    Speed00 = 0
+    Speed30 = 60  # 0x0000003C
+    Speed35 = 70  # 0x00000046
+    Speed40 = 80  # 0x00000050
+    Speed45 = 90  # 0x0000005A
+    Speed50 = 100  # 0x00000064
+    Speed60 = 120  # 0x00000078
+    Speed70 = 140  # 0x0000008C
+
+
+class RGBLightbarControlByteFlag(Enum):
+    AP_Exist = 0
+    PowerSaveMode = 2
+    S0_Switch = 4
+    S3_Switch = 8
+    Welcome = 128  # 0x00000080
+
+
+# Custom Enums not in original program:
+
+
+class Sensors(Enum):
+    Speed = 0x1804
+    Temp = 0x043e
