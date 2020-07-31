@@ -10,6 +10,27 @@ class TongfangController():
         self.fan = FanController(self.acpi)
         self.lightbar = LightBarController(self.acpi)
 
+    def check_support(self, support_byte: int, flag: Union[SupportByteOneFlag, SupportByteTwoFlag, SupportByteThreeFlag]) -> bool:
+        """Checks if a particular feature is supported. (This method doesn't work on all devices)
+
+        Args:
+            support_byte (int): The support byte to check. Can be 1,2 or 3.
+            flag (Union[SupportByteOneFlag, SupportByteTwoFlag, SupportByteThreeFlag]): The feature to check
+
+        Returns:
+            bool: Whether the specified feature is supported
+        """
+        if support_byte == 1:
+            addr = ADDR_SUPPORT_BYTE1
+        elif support_byte == 2:
+            addr = ADDR_SUPPORT_BYTE2
+        elif support_byte == 3:
+            addr = ADDR_SUPPORT_BYTE5
+        else:
+            raise ValueError("Invalid support byte")
+        flag = flag.value
+        return self.acpi.get_flag(addr, flag)
+
     def trigger(self, flag: TriggerByteFlag):
         self.acpi.set_flag(ADDR_TRIGGER_BYTE, flag.value, True)
 
