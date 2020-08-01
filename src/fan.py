@@ -200,7 +200,7 @@ class FanController(AcpiController):
         return (data >> 1 & 1) == 1
 
     def get_speed(self):
-        return self.acpi.read_ecram(Sensors.Speed)
+        return self.acpi.read_ecram(Sensors.Speed.value)
 
     def get_temp(self):
-        return self.acpi.read_ecram(Sensors.Temp)
+        return self.acpi.read_ecram(Sensors.Temp.value)
