@@ -1,3 +1,4 @@
+from typing import Union
 from acpi import BaseAcpiController
 from ecspec import *
 from fan import FanController
