@@ -21,6 +21,34 @@ This project is still in heavily development and  is not ready for daily usage.
 
 For developers, you will need the `wmi` Python package if on Windows and the `acpi-call-dkms` kernel module if on Linux.
 
+Once the package is installed, it can be used using the `tongfang-control` command.
+
+```bash
+# Show all possible commands and values
+tongfang-control --help
+
+# Set light bar color to red
+tongfang-control --lightbar-color 255 0 0
+
+# Enable the light bar's rainbow mode which cycles between multiple colors.
+tongfang-control --lightbar-colorful true
+
+# Change fan mode to one that intelligently adjusts the fan speed proportionally to temperatures.
+# This mode is equivalent to the gaming mode in the official Tongfang control center for Windows.
+tongfang-control --fan-mode intelligent
+# Set fan mode to intelligent and enable fan boost to run fans at their maximum speed.
+tongfang-control --fan-mode boost
+
+# Set the fan's loudness to silent. This is equivalent to the advanced silent mode in the official
+# Tongfang control center for windowsW
+tongfang-control --fan-loudness quiet
+# Make the fan's as quiet as possible.
+tongfang-control --fan-loudness silent
+
+# Display fan speed and temperature every 2 seconds
+tongfang-control --monitor
+```
+
 ## Related projects
 
 - [Tuxedo Control Center](https://github.com/tuxedocomputers/tuxedo-control-center) - Control center for Tuxedo laptops with support for fan speed adjustment using profiles. Works with Tongfang and Clevo laptops that use the Uniwill OEM interface. ([See the driver for more](https://github.com/tuxedocomputers/tuxedo-cc-wmi)).
