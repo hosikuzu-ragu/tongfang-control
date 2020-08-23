@@ -15,11 +15,25 @@ This is project was started before [Tuxedo Computer's control center](https://gi
 
 Various Clevo, Mechrevo, Eluktronics, XMG, Avell and Aftershock laptops that use the same chassis probably also work.
 
+## Installation
+
+First, if you are on Linux, you will need the `acpi-call-dkms` kernel module. To install it on Ubuntu, run:
+
+```bash
+sudo apt install acpi-call-dkms
+sudo modprobe acpi_call
+```
+
+Then build and install the package:
+
+```bash
+python3 setup.py build
+sudo python3 setup.py install
+```
+
 ## Usage
 
-This project is still in heavily development and  is not ready for daily usage.
-
-For developers, you will need the `wmi` Python package if on Windows and the `acpi-call-dkms` kernel module if on Linux.
+Please note that this project is still in heavily development and is not ready for daily usage.
 
 Once the package is installed, it can be used using the `tongfang-control` command.
 
