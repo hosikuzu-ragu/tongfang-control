@@ -14,7 +14,7 @@ setuptools.setup(
     url="https://gitlab.com/siphomateke/tongfang-control",
     packages=setuptools.find_packages(),
     license="MIT",
-    install_requires=["wmi"],
+    install_requires=["wmi~=1.5.1;platform_system=='Windows'"],
     classifiers=(
         "Development Status :: 3 - Alpha",
         "Intended Audience :: End Users/Desktop",
