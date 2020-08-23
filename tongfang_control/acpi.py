@@ -90,63 +90,88 @@ def kernel_module_loaded(module_name: str):
 
 
 class BaseAcpiController():
-    wmi_connection = None
+    wmi_test_ulong = None
+    wmi_odm_demo = None
 
     def __init__(self):
         if os_type == "Windows":
-            self.wmi_connection = wmi.WMI(
+            self.wmi_test_ulong = wmi.WMI(
                 moniker='root/WMI:AcpiTest_MULong.InstanceName="ACPI\\\\PNP0C14\\\\1_1"')
+            self.wmi_odm_demo = wmi.WMI(
+                moniker='root/WMI:AcpiODM_Demo.InstanceName="ACPI\\\\PNP0C14\\\\2_0"')
         elif os_type == "Linux":
             # Make sure the necessary kernel module is loaded
             if not kernel_module_loaded("acpi_call"):
                 raise Exception(
                     "The acpi-call-dkms kernel module is required to run this software.")
 
-    def watch_for_events(self):
-        return
-        # FIXME: Implement
-        # watcher = wmi.WMI(namespace="WMI").AcpiTest_EventULong.watch_for()
-        # while True:
-        #     event = watcher()
-        #     event_id = event.ULong
-        #     event_name = "Unknown"
-        #     if event_id in acpi_event_names:
-        #         event_name = acpi_event_names[event_id]
-        #     print(event_id, event_name)
+    def linux_acpi_call(self, acpi_method, instance, method, data):
+        command = "echo '{0} {1} {2} {3}' | sudo tee /proc/acpi/call".format(
+            acpi_method, instance, method, data)
+        subprocess.check_call(command, shell=True,
+                              stdout=subprocess.DEVNULL)
 
-    def acpi_call(self, data):
+        # TODO: Avoid using sudo
+        response = subprocess.check_output(
+            "sudo cat /proc/acpi/call", shell=True)
+        # Remove trailing newline and convert to string
+        response = response[:-1].decode('utf-8')
+        response = buffer_to_int(response)
+        return response
+
+    def watch_for_events(self):
+        if os_type == "Windows":
+            watcher = wmi.WMI(namespace="WMI").AcpiTest_EventULong.watch_for()
+            while True:
+                event = watcher()
+                event_id = event.ULong
+                event_name = "Unknown"
+                if event_id in acpi_event_names:
+                    event_name = acpi_event_names[event_id]
+                print(event_id, event_name)
+                # FIXME: Implement actual event handling
+        elif os_type == "Linux":
+            # FIXME: Implement Linux version
+            print("Error: Linux event handling is not yet supported")
+            return
+
+    def write_bios_ram(self, data):
+        # root\\WMI", "AcpiODM_Demo.InstanceName='ACPI\\PNP0C14\\2_0'
+        #  "GetUlongEx7"
+        if os_type == "Linux":
+            acpi_method = "\_SB_.OTA0._WDG"  # AcpiODM_Demo
+            instance = 0
+            method = 7  # GetUlongEx7
+            return self.linux_acpi_call(acpi_method, instance, method, data)
+        elif os_type == "Windows":
+            response = self.wmi_odm_demo.GetUlongEx7(data)[0]
+            return response
+        else:
+            raise Exception(
+                "Unsupported operating system: {0}".format(os_type))
+
+    def getsetulong(self, data):
         # TODO: Make sure console errors are thrown
         if os_type == "Linux":
             acpi_method = "\_SB.AMW0.WMBC"  # AcpiTest_MULong
             instance = 0
             method = 4  # GetSetULong
-            command = "echo '{0} {1} {2} {3}' | sudo tee /proc/acpi/call".format(
-                acpi_method, instance, method, data)
-            subprocess.check_call(command, shell=True,
-                                  stdout=subprocess.DEVNULL)
-
-            # TODO: Avoid using sudo
-            response = subprocess.check_output(
-                "sudo cat /proc/acpi/call", shell=True)
-            # Remove trailing newline and convert to string
-            response = response[:-1].decode('utf-8')
-            response = buffer_to_int(response)
-            return response
+            return self.linux_acpi_call(acpi_method, instance, method, data)
         elif os_type == "Windows":
-            response = self.wmi_connection.GetSetULong(data)[0]
+            response = self.wmi_test_ulong.GetSetULong(data)[0]
             return response
         else:
             raise Exception(
                 "Unsupported operating system: {0}".format(os_type))
 
     def read_ecram(self, address, byte=True):
-        data = self.acpi_call(0x10000000000 + address)
+        data = self.getsetulong(0x10000000000 + address)
         if byte:
             data = data & 255
         return data
 
     def write_ecram(self, address, value):
-        return self.acpi_call(0x0000000000000000 + (value << 16) + address)
+        return self.getsetulong(0x0000000000000000 + (value << 16) + address)
 
     def set_flag(self, address, flag, enabled):
         """
@@ -160,6 +185,9 @@ class BaseAcpiController():
 
     def get_flag(self, address, flag) -> bool:
         return (self.read_ecram(address) & flag) == flag
+
+    def combine_bits(self, bits: list):
+        return int.from_bytes(bytes(bits), "little")
 
 
 class AcpiController():
