@@ -145,7 +145,7 @@ defined, this is a firmware bug that leads to ambiguous behaviour.
 Based on the documentation for `AcpiTest_MULong`, we know that there is a string
 (instanceName) and three methods with IDs 1, 2 and 3.
 
-After finding , I decided to start messing around with ACPI calls using `sudo
+After finding this, I decided to start messing around with ACPI calls using `sudo
 apt install acpi-call-dkms`.
 
 The first on I tried was a simple query to get the current value of the light
@@ -165,7 +165,7 @@ an instance, not sure which to use though so I tested with 0.
 
 Should instance be `WMBC`?
 
-Before running, [debug using apciexec](https://wiki.ubuntu.com/Kernel/Reference/ACPITricksAndTips#acpiexec).
+Before running, [debug using acpiexec](https://wiki.ubuntu.com/Kernel/Reference/ACPITricksAndTips#acpiexec).
 From debugging, we can tell that the method to call is `\_SB.AMW0.WMBC`.
 
 Debug command:
