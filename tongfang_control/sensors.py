@@ -1,7 +1,7 @@
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import datetime as dt
-from controller import TongfangController
+from tongfang_control.controller import TongfangController
 
 
 def graph_sensors(controller: TongfangController, sensors, sensor_names):

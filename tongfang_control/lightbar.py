@@ -1,5 +1,5 @@
-from acpi import AcpiController
-from ecspec import *
+from tongfang_control.acpi import AcpiController
+from tongfang_control.ecspec import *
 from enum import Enum
 
 # TODO: Find out what ApExit, LB10NoKey and LB10KeyPress are and if they are supported

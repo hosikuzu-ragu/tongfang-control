@@ -9,6 +9,8 @@ setuptools.setup(
     author="Sipho Mateke",
     author_email="siphomateke@gmail.com",
     description="Command line tool for controlling various features of Tongfang-based laptops' such as RGB lighting and fan speed.",
+    entry_points={'console_scripts': [
+        'tongfang-control = tongfang_control.main:main']},
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://gitlab.com/siphomateke/tongfang-control",

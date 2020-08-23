@@ -1,8 +1,8 @@
 from typing import Union
-from acpi import BaseAcpiController
-from ecspec import *
-from fan import FanController
-from lightbar import LightBarController
+from tongfang_control.acpi import BaseAcpiController
+from tongfang_control.ecspec import *
+from tongfang_control.fan import FanController
+from tongfang_control.lightbar import LightBarController
 
 
 class TongfangController():

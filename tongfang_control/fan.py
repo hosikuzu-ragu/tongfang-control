@@ -1,6 +1,6 @@
 from enum import Enum
-from acpi import AcpiController
-from ecspec import *
+from tongfang_control.acpi import AcpiController
+from tongfang_control.ecspec import *
 
 OfficeMode_Tau_Default = 56
 OfficeMode_PL1_Default = 5

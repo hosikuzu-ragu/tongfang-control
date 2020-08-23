@@ -1,8 +1,8 @@
-from controller import TongfangController
 import argparse
 from enum import Enum
-from ecspec import *
-from fan import FanMode, LoudnessLevel
+from tongfang_control.controller import TongfangController
+from tongfang_control.ecspec import *
+from tongfang_control.fan import FanMode, LoudnessLevel
 from time import sleep
 
 tongfang = TongfangController()
