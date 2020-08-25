@@ -89,6 +89,10 @@ def kernel_module_loaded(module_name: str):
     return grep_proc.returncode == 0
 
 
+class AcpiException(Exception):
+    pass
+
+
 class BaseAcpiController():
     wmi_test_ulong = None
     wmi_odm_demo = None
@@ -102,8 +106,8 @@ class BaseAcpiController():
         elif os_type == "Linux":
             # Make sure the necessary kernel module is loaded
             if not kernel_module_loaded("acpi_call"):
-                raise Exception(
-                    "The acpi-call-dkms kernel module is required to run this software.")
+                raise AcpiException(
+                    "The acpi-call-dkms kernel module is required to run this software. Try running 'sudo modprobe acpi_call'")
 
     def linux_acpi_call(self, acpi_method, instance, method, data):
         command = "echo '{0} {1} {2} {3}' | sudo tee /proc/acpi/call".format(

@@ -1,23 +1,22 @@
 import argparse
 from enum import Enum
+from tongfang_control.acpi import AcpiException
 from tongfang_control.controller import TongfangController
 from tongfang_control.ecspec import *
 from tongfang_control.fan import FanMode, LoudnessLevel
 from time import sleep
 
-tongfang = TongfangController()
 
-
-def display_status():
+def display_status(controller):
     output = ""
-    output += "Fan speed: {0} RPM".format(tongfang.fan.get_speed())
-    output += ", Temp: {0}°C".format(tongfang.fan.get_temp())
+    output += "Fan speed: {0} RPM".format(controller.fan.get_speed())
+    output += ", Temp: {0}°C".format(controller.fan.get_temp())
     print(output)
 
 
-def monitor():
+def monitor(controller):
     while True:
-        display_status()
+        display_status(controller)
         sleep(2)
 
 
@@ -78,6 +77,8 @@ def main():
     )
     parsed = parser.parse_args()
 
+    tongfang = TongfangController()
+
     if parsed.lightbar_color is not None:
         colors = parsed.lightbar_color
         valid = all(color >= 0 and color < 256 for color in colors)
@@ -120,8 +121,11 @@ def main():
                 print("Set fan loudness to Extra quiet")
 
     if parsed.monitor:
-        monitor()
+        monitor(tongfang)
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except AcpiException as e:
+        print("Error: {0}".format(e))
