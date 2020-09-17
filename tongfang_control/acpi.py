@@ -120,7 +120,12 @@ class BaseAcpiController():
             "sudo cat /proc/acpi/call", shell=True)
         # Remove trailing newline and convert to string
         response = response[:-1].decode('utf-8')
-        response = buffer_to_int(response)
+        try:
+            # Try parsing as hex string ("0xffffffff")
+            response = int(response, 16)
+        except:
+            # If that fails, assume it is a buffer string ("{0xff, 0x00}")
+            response = buffer_to_int(response)
         return response
 
     def watch_for_events(self):
@@ -173,7 +178,7 @@ class BaseAcpiController():
         return data
 
     def write_ecram(self, address, value):
-        return self.getsetulong(0x0000000000000000 + (value << 16) + address)
+        return self.getsetulong((value << 16) + address)
 
     def set_flag(self, address, flag, enabled):
         """

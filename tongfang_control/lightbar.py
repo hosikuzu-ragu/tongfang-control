@@ -62,7 +62,6 @@ class LightBarController(AcpiController):
             self.set_color_level(LightBarColor.Blue,
                                  ADDR_BLUEBAR_CONTROL_BYTE, b)
 
-        # FIXME: Save lightbar settings to BIOS
         self.set_oem_service_new(
             1, 0,
             self.colors[LightBarColor.Red],
