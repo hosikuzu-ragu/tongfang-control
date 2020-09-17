@@ -109,9 +109,9 @@ class BaseAcpiController():
                 raise AcpiException(
                     "The acpi-call-dkms kernel module is required to run this software. Try running 'sudo modprobe acpi_call'")
 
-    def linux_acpi_call(self, acpi_method, instance, method, data):
+    def linux_acpi_call(self, acpi_class, instance, method, data):
         command = "echo '{0} {1} {2} {3}' | sudo tee /proc/acpi/call".format(
-            acpi_method, instance, method, data)
+            acpi_class, instance, method, data)
         subprocess.check_call(command, shell=True,
                               stdout=subprocess.DEVNULL)
 
@@ -140,13 +140,11 @@ class BaseAcpiController():
             return
 
     def write_bios_ram(self, data):
-        # root\\WMI", "AcpiODM_Demo.InstanceName='ACPI\\PNP0C14\\2_0'
-        #  "GetUlongEx7"
         if os_type == "Linux":
-            acpi_method = "\_SB_.OTA0._WDG"  # AcpiODM_Demo
+            acpi_class = "\_SB.OTA0.WMBC"  # AcpiODM_Demo
             instance = 0
             method = 7  # GetUlongEx7
-            return self.linux_acpi_call(acpi_method, instance, method, data)
+            return self.linux_acpi_call(acpi_class, instance, method, data)
         elif os_type == "Windows":
             response = self.wmi_odm_demo.GetUlongEx7(data)[0]
             return response
@@ -157,10 +155,10 @@ class BaseAcpiController():
     def getsetulong(self, data):
         # TODO: Make sure console errors are thrown
         if os_type == "Linux":
-            acpi_method = "\_SB.AMW0.WMBC"  # AcpiTest_MULong
+            acpi_class = "\_SB.AMW0.WMBC"  # AcpiTest_MULong
             instance = 0
             method = 4  # GetSetULong
-            return self.linux_acpi_call(acpi_method, instance, method, data)
+            return self.linux_acpi_call(acpi_class, instance, method, data)
         elif os_type == "Windows":
             response = self.wmi_test_ulong.GetSetULong(data)[0]
             return response
