@@ -75,54 +75,17 @@ tongfang-control --monitor
 
 ## History
 
-This is a brief rundown of how this project was developed.
+This is a brief rundown of the steps taken to develop this project and make it work on Linux.
 
-Figured out I needed to write to ACPI using WMI.
+The first step is to figure out what commands the Tongfang control center for Windows uses to change things like fan speed and light bar color. Looking at some of the source code, we can see snippets like:
 
-The WMI class is `AcpiTest_MULong` and the instance is `PNP0C14\1_1`.
-
-Figured out GUID of `AcpiTest_MULong` is `ABBC0F6F-8EA1-11d1-00A0-C90629100000` by
-checking
-<https://github.com/microsoft/Windows-driver-samples/blob/6c1981b8504329521343ad00f32daa847fa6083a/wmi/wmiacpi/acpimof.mof>
-where we can also see the documentation for the class.
-
-```
-[WMI,
- Dynamic,
- Provider("WmiProv"),
- Locale("MS\\0x409"),
- Description("Class used to operate methods on a ULong"),
- guid("{ABBC0F6F-8EA1-11d1-00A0-C90629100000}")
-]
-class AcpiTest_MULong
-{
-    [key, read]
-     string InstanceName;
-    [read] boolean Active;
-
-    [WmiMethodId(1),
-     Implemented,
-     read, write,
-     Description("Return the contents of a ULong")
-    ] void GetULong([out, Description("Ulong Data")] uint32 Data);
-
-    [WmiMethodId(2),
-     Implemented,
-     read, write,
-     Description("Set the contents of a ULong")
-    ] void SetULong([in, Description("Ulong Data")] uint32 Data);
-
-    [WmiMethodId(3),
-     Implemented,
-     read, write,
-     Description("Generate an event containing ULong data")
-    ] void FireULong([in, Description("WMI requires a parameter")] uint32 Hack);
-};
+```c#
+ManagementObject managementObject = new ManagementObject("root\\WMI", "AcpiTest_MULong.InstanceName='ACPI\\PNP0C14\\1_1'", (ObjectGetOptions) null);
 ```
 
-Also <https://github.com/ehntoo/gk5cn6z_wmi/blob/master/gk5cn6z_wqba.mof>:
+This indicates that the control center is using [Windows Management Instrumentation (WMI)](https://wiki.ubuntu.com/Kernel/Reference/WMI) to access the [Advanced Configuration and Power Interface (ACPI)](https://en.wikipedia.org/wiki/Advanced_Configuration_and_Power_Interface). The main WMI class used to read and write light bar and fan values is `AcpiTest_MULong`. To access this class from Linux, we first need to figure out it's GUID. This can be done by looking at the documentation for this WMI class found in extracted `.mof` files for the particular laptop's model such as <https://github.com/ehntoo/gk5cn6z_wmi/blob/master/gk5cn6z_wqba.mof>. This file tells us that the GUID of `AcpiTest_MULong` is `ABBC0F6F-8EA1-11d1-00A0-C90629100000`:
 
-```
+```txt
 [WMI,
  Dynamic,
  Provider("WmiProv"),
@@ -169,10 +132,39 @@ class AcpiTest_MULong {
 };
 ```
 
-Correlated this with output of `fwts wmi -` (See
+There is also another WMI class for writing to the BIOS RAM and making light bar colors persistent. This class is `AcpiODM_Demo` and its GUID is `DBBC0F6F-8EA1-11d1-00A0-C90629100000` as per <https://github.com/ehntoo/gk5cn6z_wmi/blob/master/gk5cn6z_wqba2.mof>:
+
+```txt
+class WMIEvent : __ExtrinsicEvent {
+};
+
+[WMI, Locale("MS\\0x409"), Description("This class contains the definition of the package used in other classes"), guid("{ABBC0F60-8EA1-11d1-00A0-C90629100000}")]
+class Package {
+  [WmiDataId(1), read, write, Description("16 bytes of data")] uint8 Bytes[16];
+};
+
+[WMI, Dynamic, Provider("WmiProv"), Locale("MS\\0x409"), Description("Class used to operate methods on a ULong"), guid("{DBBC0F6F-8EA1-11d1-00A0-C90629100000}")]
+class AcpiODM_Demo {
+  [key, read] String InstanceName;
+  [read] Boolean Active;
+
+  [WmiMethodId(1), Implemented, read, write, Description("Get Set the contents of a Long for Ex1")] void GetUlongEx1([in, Description("long Data")] sint32 Data, [out, Description("long Data")] sint32 Return);
+  [WmiMethodId(2), Implemented, read, write, Description("Get Set the contents of a Long for Ex2")] void GetUlongEx2([in, Description("long Data")] sint32 Data, [out, Description("long Data")] sint32 Return);
+  [WmiMethodId(3), Implemented, read, write, Description("Get Set the contents of a Long for Ex3")] void GetUlongEx3([in, Description("long Data")] sint32 Data, [out, Description("long Data")] sint32 Return);
+  [WmiMethodId(4), Implemented, read, write, Description("Get Set the contents of a Long for Ex4")] void GetUlongEx4([in, Description("long Data")] sint32 Data, [out, Description("long Data")] sint32 Return);
+  [WmiMethodId(5), Implemented, read, write, Description("Get Set the contents of a Long for Ex5")] void GetUlongEx5([in, Description("long Data")] sint32 Data, [out, Description("long Data")] sint32 Return);
+  [WmiMethodId(6), Implemented, read, write, Description("Get Set the contents of a Long for Ex6")] void GetUlongEx6([in, Description("long Data")] sint32 Data, [out, Description("long Data")] sint32 Return);
+  [WmiMethodId(7), Implemented, read, write, Description("Get Set the contents of a Long for Ex7")] void GetUlongEx7([in, Description("int64 Data")] uint64 Data, [out, Description("long Data")] uint32 Return);
+  [WmiMethodId(8), Implemented, read, write, Description("Get Set the contents of a Long for Ex8")] void GetUlongEx8([in, Description("long Data")] sint32 Data, [out, Description("long Data")] sint32 Return);
+  [WmiMethodId(9), Implemented, read, write, Description("Get Set the contents of a Long for Ex9")] void GetUlongEx9([in, Description("long Data")] sint32 Data, [out, Description("long Data")] sint32 Return);
+  [WmiMethodId(10), Implemented, read, write, Description("Get Set the contents of a Long for Ex10")] void GetUlongEx10([in, Description("long Data")] sint32 Data, [out, Description("long Data")] sint32 Return);
+};
+```
+
+We can then correlate the GUIDs of the classes above with the output of `fwts wmi -` to determine the class names on Linux (See
 <https://wiki.ubuntu.com/Kernel/Reference/WMI>):
 
-```
+```txt
 \_SB_.AMW0._WDG (6 of 10)
   GUID: ABBC0F6F-8EA1-11D1-00A0-C90629100000
   WMI Method:
@@ -184,46 +176,55 @@ ABBC0F6F-8EA1-11D1-00A0-C90629100000 has multiple associated methods WMBC
 defined, this is a firmware bug that leads to ambiguous behaviour.
 ```
 
-Based on the documentation for `AcpiTest_MULong`, we know that there is a string
-(instanceName) and three methods with IDs 1, 2 and 3.
+and for `AcpiODM_Demo`:
 
-After finding this, I decided to start messing around with ACPI calls using `sudo
-apt install acpi-call-dkms`.
-
-The first on I tried was a simple query to get the current value of the light
-bar.
-
-The Driver is `\_SB_.AMW0._WDG`, the unsigned integer for the light bar is
-`1895UL`. The address to read is thus `0x10000000000 + 1895UL = 1099511629671`.
-
-The method is `WMBC`, method id is `GetSetULong`. Then we need
-an instance, not sure which to use though so I tested with 0.
-
-`WMBC` methods take three arguments: ulong instance index, method ID,
-
-| Method | Instance index | Method ID | Input data    |
-| ------ | -------------- | --------- | ------------- |
-| WMBC   | 0              | 4         | 1099511629671 |
-
-Should instance be `WMBC`?
-
-Before running, [debug using acpiexec](https://wiki.ubuntu.com/Kernel/Reference/ACPITricksAndTips#acpiexec).
-From debugging, we can tell that the method to call is `\_SB.AMW0.WMBC`.
-
-Debug command:
-
-```
-execute _SB.AMW0.WMBC 0 4 <value>
+```txt
+\_SB_.OTA0._WDG (1 of 2)
+  GUID: DBBC0F6F-8EA1-11D1-00A0-C90629100000
+  WMI Method:
+    Flags          : 0x02 (Method)
+    Object ID      : BC
+    Instance       : 0x0a
+FAILED [LOW] WMIMultipleMethod: Test 1, GUID DBBC0F6F-8EA1-11D1-00A0-C90629100000 has multiple associated methods WMBC defined, this is a firmware bug that leads
+to ambiguous behaviour.
 ```
 
-So the full call is:
+After finding this, we can try actually making some ACPI calls using [acpi_call](https://github.com/mkottman/acpi_call) (`sudo
+apt install acpi-call-dkms`). Let's first try a simple query to get the current value of the light
+bar. Based on the Windows control center, doing this requires `AcpiTest_MULong.GetSetULong` to be called with an unsigned integer representing the ID of the light bar, `1895UL`. Additionally, before passing this ID to the `GetSetULong`, it must be converted to a supported format by adding `0x10000000000` to it. So the final value that must be passed to `GetSetULong` is `0x10000000000 + 1895UL = 1099511629671`.
+
+Based on the output of `fwts` from above, we now know that the WMI class is `\_SB_.AMW0.WMBC`. All WMI methods are prefixed with `WM` (See [Linux WMI reference](https://wiki.ubuntu.com/Kernel/Reference/WMI#WMxx_Methods)) and are followed by the object ID of the particular method, in this case, `BC`. As per the WMI reference:
+
+> These [WMI] methods take 3 arguments, the first is a ULONG specifying the  instance index being executed [...] The second contains the  method ID of the method being executed. The third argument contains the input data for that method call.
+
+How to determine the instance index is still unclear but 0 appears to work. The method ID for `GetSetULong` is 4 based on the `.mof` file documentation above, and our input data is `1099511629671`.
+
+Before we actually try running this ACPI command, we should [debug it using acpiexec](https://wiki.ubuntu.com/Kernel/Reference/ACPITricksAndTips#acpiexec). First, we confirm that the full class method exists by running `methods` in acpiexec. Searching the output, we find that there is indeed a method called `\_SB.AMW0.WMBC` that takes 3 arguments. We can now simulate checking the light bar's current value:
+
+```txt
+execute _SB.AMW0.WMBC 0 4 1099511629640
+```
+
+If all is well, this should return a buffer like this:
+
+```txt
+Evaluation of \_SB.AMW0.WMBC returned object 0x5559bfcaacd0, external buffer length 40
+  [Buffer] Length 28 =
+    0000: FE FE FE FE 00 00 00 00 00 00 00 00 00 00 00 00  // ................
+    0010: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  // ................
+    0020: 00 00 00 00 00 00 00 00                          // ........
+```
+
+We can now try running the ACPI call on the live system using the following command:
 
 ```bash
 echo '\_SB.AMW0.WMBC 0 4 1099511629640' | sudo tee /proc/acpi/call
 sudo cat /proc/acpi/call
 ```
 
-I then debugged the responses of reading data from the driver on Windows;
+This should return a buffer matching the output from our acpiexec simulation.
+
+Now that we can actually read the ACPI data, the next step is converting it into a usable format and interpreting its meaning. By running the same commands on Windows using C# or WMI libraries such as [Python's WMI](https://pypi.org/project/WMI/), we can figure out how the buffers are cnoverted and what the converted values mean. Below is a table showing various methods responses;
 
 | Prop name | Prop   | Prop address  | State     | Return (uint) | Return (byte) | notes                             |
 | --------- | ------ | ------------- | --------- | ------------- | ------------- | --------------------------------- |
@@ -232,15 +233,44 @@ I then debugged the responses of reading data from the driver on Windows;
 |           | 1864UL | 1099511629640 | Disabled  | 1037          | 13            | flipped and converted to byte = 0 |
 | Fan       | 1873UL | 1099511629649 | Game mode | 27808         | 160           |                                   |
 
-The unsigned integer responses are converted to bytes using this C# code
+In the original Windows control center software, the unsigned integer responses are converted to bytes using this C# code
 
 ```csharp
 (byte) (Convert.ToUInt64(data) & (ulong) byte.MaxValue)
 ```
 
-I then compared these responses to those on Linux to figure out how to convert the buffers from the Linux ACPI calls to the unsigned integers returned on Windows.
+The responses on Windows can then be compared to those on Linux to figure out how to convert the buffers from the Linux ACPI calls to the unsigned integers returned on Windows.
 
 | Prop name | Command                          | State     | Return                                                                                                                                                                                                                                           |
 | --------- | -------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Lightbar  | \_SB.AMW0.WMBC 0 4 1099511629640 | Enabled   | {0x00, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00} |
 | Fan       | \_SB.AMW0.WMBC 0 4 1099511629649 | Game mode | {0xa0, 0x6c, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00} |
+
+Looking at the above buffers, we can see that they are simply reversed byte array versions of the integers returned on Windows. For example, the value when the fan is in game mode is:
+
+```python
+{0xa0,0x6c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}
+= 0x0000000000000000000000006CA0
+= 27808
+```
+
+The integer can then be converted to a byte by doing a bitwise AND with 255:
+
+```python
+27808 & 255
+= 160
+```
+
+We can then follow similar steps to figure out how to call `AcpiODM_Demo.GetUlongEx7` in order to write to the BIOS RAM and make light bar colors persistent. Using the above steps, we can figure out that the class is `\_SB.OTA0.WMBC` and method ID for `GetUlongEx7` is 7. So an actual command would look like this:
+
+```txt
+execute \_SB.OTA0.WMBC 0 7 <value>
+```
+
+Which returns a response like:
+
+```txt
+Evaluating \_SB.OTA0.WMBC
+Evaluation of \_SB.OTA0.WMBC returned object 0x55fcde965cd0, external buffer length 18
+  [Integer] = 00000000FFFFFFFF
+```
