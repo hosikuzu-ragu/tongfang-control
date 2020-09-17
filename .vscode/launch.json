@@ -8,7 +8,7 @@
             "name": "Python: main.py",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/tongfang_control/main.py",
+            "module": "tongfang_control.main",
             "console": "integratedTerminal"
         }
     ]
