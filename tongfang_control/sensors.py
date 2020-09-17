@@ -56,7 +56,7 @@ def graph_sensors(controller: TongfangController, sensors, sensor_names):
     plt.show()
 
 
-def discover_sensors():
+def discover_sensors(tongfang: TongfangController):
     sensors = [
         6148,  # 0b1100000000100 71 -> 69 :: Fan speed
         6173,  # 0b1100000011101 23296 -> 23040
@@ -92,7 +92,7 @@ def discover_sensors():
         6173: 'follows 1123',
     }
 
-    # graph_sensors(tongfang, sensors, sensor_names)
+    graph_sensors(tongfang, sensors, sensor_names)
 
     # prev_values = {}
     # for start in [0x1804, 0x043e]:

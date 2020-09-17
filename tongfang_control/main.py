@@ -7,7 +7,7 @@ from tongfang_control.fan import FanMode, LoudnessLevel
 from time import sleep
 
 
-def display_status(controller):
+def display_status(controller: TongfangController):
     output = ""
     output += "Fan speed: {0} RPM".format(controller.fan.get_speed())
     output += ", Temp: {0}°C".format(controller.fan.get_temp())
