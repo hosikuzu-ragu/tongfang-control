@@ -1,3 +1,8 @@
+## Source
+This project was migrated from GitLab.
+Original repository: https://gitlab.com/siphomateke/tongfang-control
+
+
 # Tongfang Unofficial Control Center
 
 An open-source cross-platform control centre for controlling various features of Tongfang-based laptops' such as RGB lighting and fan speed. Developed for the GK5CP0Z but will likely work with similar models (GK5CN5Z, GK5CN6Z, GK5CQ7Z etc.).
