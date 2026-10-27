@@ -146,7 +146,7 @@ class BaseAcpiController():
 
     def write_bios_ram(self, data):
         if os_type == "Linux":
-            acpi_class = "\_SB.OTA0.WMBC"  # AcpiODM_Demo
+            acpi_class = r"\_SB.OTA0.WMBC"  # AcpiODM_Demo
             instance = 0
             method = 7  # GetUlongEx7
             return self.linux_acpi_call(acpi_class, instance, method, data)
@@ -160,7 +160,7 @@ class BaseAcpiController():
     def getsetulong(self, data):
         # TODO: Make sure console errors are thrown
         if os_type == "Linux":
-            acpi_class = "\_SB.AMW0.WMBC"  # AcpiTest_MULong
+            acpi_class = r"\_SB.AMW0.WMBC"  # AcpiTest_MULong
             instance = 0
             method = 4  # GetSetULong
             return self.linux_acpi_call(acpi_class, instance, method, data)
